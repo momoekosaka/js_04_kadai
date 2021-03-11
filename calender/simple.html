@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <title>ダイエットカレンダーアプリ</title>
+    <style>
+      /* この中にcssをかけます */
+
+      title{
+        color: rgb(226, 174, 206);
+        font-family: monospace;
+        font-weight: 80;
+      }
+
+      .box1{
+        color: rgb(252, 113, 199);
+        font-family: monospace;
+        font-weight: 30;
+        width: 600px;
+        height: 60px;
+        background-image: url(../image/health.jpeg);
+        background-attachment: fixed;
+        font-family: monospace;
+        background-position: center center;
+        background-size: cover;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+      }
+
+      #resister{
+        background-color: rgb(228, 173, 173);
+      }
+
+      h2{
+        font-size: 5;
+        font-family: monospace;
+      }
+
+    </style>
+  </head>
+  <body>
+    <!-- ブラウザの画面に見える内容 -->
+    <title>ダイエットカレンダー</title>
+    <h1 class = box1>
+      
+      毎日の健康管理をサポートします</h1>
+    <input type="date" id="date">
+    <div>
+      　身長を入力
+      <div>
+        <input type="h" id="height" />
+        cm
+      </div>
+      　体重を入力
+      <div>
+        <input type="w" id="weight" />
+        kg
+      </div>
+    </div>
+      <!-- 登録ボタン -->
+      <button id="resister">登録</button>
+    </div>
+
+    <h2>体重推移</h2>
+    <canvas id="Chart"></canvas>
+
+    
+
+    <!-- 保存されたデータが表示される箇所 -->
+      <div id="output"></div>
+    </div>
+    　　　　
+    <!--/ ブラウザの画面に見える内容 -->
+    <!-- JQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <!--** 以下Firebase **-->
+    <!-- The core Firebase JS SDK is always required and must be listed first -->
+    <!-- ここにfirebaseのscriptを貼り付ける -->
+    <script src="https://www.gstatic.com/firebasejs/7.14.2/firebase.js"></script>
+    <!-- chart.jsのscriptを貼り付ける -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.js"></script>
+    <script>
+      // Your web app's Firebase configuration
+      var firebaseConfig = {
+        apiKey: "",
+        authDomain: "",
+        databaseURL: "",
+        projectId: "",
+        storageBucket: "",
+        messagingSenderId: "",
+        appId: "",
+      };
+
+      // Initialize Firebase
+      firebase.initializeApp(firebaseConfig);
+      // firebaseのデーターベース（保存させる場所）を使いますよと言うjsのコードを貼り付ける
+      // xxxxxスクリプトを貼り付ける
+      const newPostRef = firebase.database().ref();
+      // ボタンをクリックされたら次の処理をする
+      $("#resister").on("click", function () {
+        let date= $("#date").val(); //jQueryの人たちが作ったもので、入力された文字や数字を取得するおまじない
+        let height= $("#height").val(); //jQueryの人たちが作ったもので、入力された文字や数字を取得するおまじない
+        let weight= $("#weight").val(); //jQueryの人たちが作ったもので、入力された文字や数字を取得するおまじない
+        
+        // BMI　体重　÷　（身長×身長）
+         b = weight / (height * height) *10000
+         console.log (Math.round(b))
+         let bmi = Math.round(b)
+
+         if (bmi <=18.5 ){
+           alert ("標準よりも痩せています")
+         }　else if(bmi>=25){
+          alert ("標準に対し肥満気味です")
+         } else{
+           alert("標準の範囲内です。今の体重をキープしましょう")
+         }
+
+
+        // データを登録で送る
+        newPostRef.push({
+          date: $("#date").val(),
+          height: $("#height").val(),
+          weight: $("#weight").val(),
+        });
+
+
+        
+        // 文字を空にする
+        $("#date").val(""); //空にする
+        $("#height").val(""); //空にする
+        $("#weight").val(""); //空にする
+
+      });
+      // 受信処理
+      newPostRef.on("child_added", function (data) {
+        //ここに保存されたデータが全て入ってくる
+        // function (data)のdataにfirebaseのデータが入ってくる
+        let v = data.val();
+        //console.logで受信=firebaseに登録されている中身を確認しよう！
+        // console.log(v);
+        
+        //テンプレートリテラル `` を活用して変数にhtmlを埋め込もう！
+        let str = `<p>${v.date},${v.height}cm,${v.weight}kg</p>`;
+      
+        
+        // ここでデータをhtmlに埋め込む prependには変数を埋め込もう！
+        $("#output").prepend(str);
+      })
+
+    
+
+      
+    </script>
+  </body>
+</html>
